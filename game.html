@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>bird</title>
+        <style media="screen">
+            canvas {
+                border: 1px black solid;
+            }
+        </style>
+        <!-- 游戏数据文件 -->
+        <script src="luckyGame/utils.js"></script>
+        <script src="luckyGame/lucky_game.js"></script>
+        <script src="luckyGame/lucky_label.js"></script>
+        <script src="luckyGame/lucky_scene.js"></script>
+        <script src="luckyGame/lucky_image.js"></script>
+        <script src="luckyGame/lucky_particle.js"></script>
+        <script src="luckyGame/lucky_animation.js"></script>
+        <!-- 场景文件 -->
+        <script src="scene/main/ball.js"></script>
+        <script src="scene/main/paddle.js"></script>
+        <script src="scene/main/block.js"></script>
+        <script src="scene/main/scene.js"></script>
+        <!-- 结束和开始场景文件 -->
+        <script src="scene/end/scene_end.js"></script>
+        <script src="scene/title/scene_title.js"></script>
+        <!-- 配置文件 -->
+        <script src="config.js"></script>
+    </head>
+    <body>
+        <!-- <canvas id="id-canvas" width="350" height="450"></canvas> -->
+        <canvas id="id-canvas" width="450" height="520"></canvas>
+        <br>
+        <input id='id-input-speed' type="range" value="30">
+        <!-- controller -->
+        <div class="kai-controls">
+            <!-- <div class="">
+                <label>
+                    <input class="kai-auto-slider" type="range"
+                    value=""
+                    data-value="config.player_speed"
+                    >
+                    玩家速度: <span class="kai-label"></span>
+                </label>
+            </div> -->
+        </div>
+        <!--  -->
+        <script>
+            var es = sel => document.querySelectorAll(sel)
+
+            var e = sel => document.querySelector(sel)
+
+            var template = function(key, item) {
+                var s = `
+                    <div class="">
+                        <label>
+                            <input class="kai-auto-slider" type="range"
+                            max='300'
+                            value="${item.value}"
+                            data-value="config.${key}"
+                            >
+                            ${item._comment}: <span class="kai-label"></span>
+                        </label>
+                    </div>
+                `
+                return s
+            }
+
+            var insertControls = function() {
+                // var divs = es('.kai-controls')
+                var div = e('.kai-controls')
+                // var myDiv = document.querySelector(".kai-controls")
+                var keys = Object.keys(config)
+                //
+                for (var k of keys) {
+                    var item = config[k]
+                    // log('insertHtml config item', item)
+                    var html = template(k, item)
+                    div.insertAdjacentHTML('beforeend', html)
+                }
+            }
+
+            var bindAll = function(sel, eventName, callback) {
+                // log('bindAll start')
+                var l = es(sel)
+                // log('var l = es(sel):', l)
+                for (var i = 0; i < l.length; i++) {
+                    var input = l[i]
+                    input.addEventListener(eventName, function(event){
+                        // log('callback start', event)
+                        callback(event)
+                        // log('callback end')
+                    })
+                }
+                // log('bindAll end')
+            }
+
+            var bindEvents = function() {
+                bindAll('.kai-auto-slider', 'input', function(event){
+                    var target = event.target
+                    // log('kai-auto-slider', target)
+                    var bindvar = target.dataset.value
+                    var v = target.value
+                    // target.dataset.value: config.player_speed
+                    // v: target.value imput 的值
+                    eval(bindvar + '.value=' + v)
+                    //
+                    var label = target.closest('label').querySelector('.kai-label')
+                    label.innerText = v
+                })
+            }
+
+
+            var __main = function() {
+                // 插入元素
+                insertControls()
+                // 绑定事件
+                bindEvents()
+            }
+
+
+            __main()
+        </script>
+        <!-- 入口 -->
+        <script src="main.js"></script>
+        <!-- 测试文件 -->
+        <script src="test.js"></script>
+    </body>
+</html>
