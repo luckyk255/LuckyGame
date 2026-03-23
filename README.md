@@ -1,4 +1,5 @@
 # LuckyGame
+- **在线试玩**：<https://luckyk255.github.io/LuckyGame/main.html>
 
 # 功能简介
 - 实现游戏资源预加载功能，程序运行前从资源管理器中预加载图片、声音等资源，无需在运行过程中重复加载，提高游戏运行时的性能。
