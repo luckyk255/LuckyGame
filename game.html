@@ -24,12 +24,35 @@
         <!-- 结束和开始场景文件 -->
         <script src="scene/end/scene_end.js"></script>
         <script src="scene/title/scene_title.js"></script>
+        <!-- PvZ 植物大战僵尸 -->
+        <script src="scene/pvz/sound_manager.js"></script>
+        <script src="scene/pvz/sprite_animation.js"></script>
+        <script src="scene/pvz/lawn.js"></script>
+        <script src="scene/pvz/plants/plant_base.js"></script>
+        <script src="scene/pvz/plants/peashooter.js"></script>
+        <script src="scene/pvz/plants/sunflower.js"></script>
+        <script src="scene/pvz/plants/wallnut.js"></script>
+        <script src="scene/pvz/plants/snowpea.js"></script>
+        <script src="scene/pvz/plants/cherrybomb.js"></script>
+        <script src="scene/pvz/plants/repeaterpea.js"></script>
+        <script src="scene/pvz/zombies/zombie_base.js"></script>
+        <script src="scene/pvz/zombies/zombie_basic.js"></script>
+        <script src="scene/pvz/zombies/zombie_cone.js"></script>
+        <script src="scene/pvz/zombies/zombie_bucket.js"></script>
+        <script src="scene/pvz/zombies/zombie_flag.js"></script>
+        <script src="scene/pvz/zombies/zombie_newspaper.js"></script>
+        <script src="scene/pvz/projectile.js"></script>
+        <script src="scene/pvz/sun.js"></script>
+        <script src="scene/pvz/plant_card.js"></script>
+        <script src="scene/pvz/scene_pvz_title.js"></script>
+        <script src="scene/pvz/scene_pvz_end.js"></script>
+        <script src="scene/pvz/scene_pvz.js"></script>
         <!-- 配置文件 -->
         <script src="config.js"></script>
     </head>
     <body>
         <!-- <canvas id="id-canvas" width="350" height="450"></canvas> -->
-        <canvas id="id-canvas" width="450" height="520"></canvas>
+        <canvas id="id-canvas" width="800" height="600"></canvas>
         <br>
         <input id='id-input-speed' type="range" value="30">
         <!-- controller -->
@@ -55,7 +78,9 @@
                     <div class="">
                         <label>
                             <input class="kai-auto-slider" type="range"
-                            max='300'
+                            min="${item.min || 0}"
+                            max="${item.max || 300}"
+                            step="${item.step || 1}"
                             value="${item.value}"
                             data-value="config.${key}"
                             >
@@ -77,6 +102,12 @@
                     // log('insertHtml config item', item)
                     var html = template(k, item)
                     div.insertAdjacentHTML('beforeend', html)
+                }
+                var labels = es('.kai-auto-slider')
+                for (var i = 0; i < labels.length; i++) {
+                    var input = labels[i]
+                    var label = input.closest('label').querySelector('.kai-label')
+                    label.innerText = input.value
                 }
             }
 

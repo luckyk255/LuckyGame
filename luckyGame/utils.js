@@ -47,6 +47,16 @@ var rectIntersects = function(a, b) {
     */
 }
 
+window.configValue = function(key, fallback) {
+    if (typeof config !== 'undefined' && config[key] !== undefined) {
+        var item = config[key]
+        if (item && item.value !== undefined) {
+            return Number(item.value)
+        }
+    }
+    return fallback
+}
+
 window.blocks = []
 window.paused = false
 
