@@ -74,14 +74,4 @@ var enableDebugMode = function(debuged, game) {
             blocks = loadLevel(Number(k), game)
         }
     })
-
-    window.input = document.querySelector('#id-input-speed')
-    input.addEventListener('input', function(event){
-        log(input.value)
-        v = Number(window.input.value)
-        if (v == 0) {
-            v = 0
-        }
-        window.fps = v
-    })
 }

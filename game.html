@@ -55,7 +55,6 @@
         <!-- <canvas id="id-canvas" width="350" height="450"></canvas> -->
         <canvas id="id-canvas" width="800" height="600"></canvas>
         <br>
-        <input id='id-input-speed' type="range" value="30">
         <!-- controller -->
         <div class="kai-controls">
             <!-- <div class="">
@@ -136,6 +135,9 @@
                     // target.dataset.value: config.player_speed
                     // v: target.value imput 的值
                     eval(bindvar + '.value=' + v)
+                    if (bindvar === 'config.fps') {
+                        window.fps = Number(v)
+                    }
                     //
                     var label = target.closest('label').querySelector('.kai-label')
                     label.innerText = v
@@ -148,6 +150,9 @@
                 insertControls()
                 // 绑定事件
                 bindEvents()
+                if (typeof config !== 'undefined' && config.fps) {
+                    window.fps = Number(config.fps.value)
+                }
             }
 
 

@@ -52,6 +52,9 @@ class ScenePvZ extends LuckyScene {
 
         // 鼠标事件
         this._setupInput()
+
+        this.pauseBtn = { x: this.game.canvas.width - 150, y: 52, w: 64, h: 26 }
+        this.menuBtn = { x: this.game.canvas.width - 78, y: 52, w: 64, h: 26 }
     }
 
     static new(game, levelIndex, overrideConfig) {
@@ -113,7 +116,7 @@ class ScenePvZ extends LuckyScene {
             },
             {
                 startSun: 100,
-                bgType: 2,
+                bgType: 0,
                 unlock: ['peashooter', 'sunflower', 'wallnut', 'snowpea', 'cherrybomb', 'repeaterpea'],
                 waves: [
                     { startDelay: 420, spawns: [
@@ -178,10 +181,13 @@ class ScenePvZ extends LuckyScene {
     // ---- 关卡配置 ----
     _getLevelConfig(level) {
         if (this.overrideConfig) {
+            this.overrideConfig.bgType = 0
             return ScenePvZ.cloneConfig(this.overrideConfig)
         }
         var configs = ScenePvZ.allLevelConfigs()
-        return configs[level] || configs[0]
+        var selected = ScenePvZ.cloneConfig(configs[level] || configs[0])
+        selected.bgType = 0
+        return selected
     }
 
     _buildCards() {
@@ -215,13 +221,39 @@ class ScenePvZ extends LuckyScene {
         this._mousemoveHandler = function(event) {
             self._onMouseMove(event.offsetX, event.offsetY)
         }
+        this._keydownHandler = function(event) {
+            if (event.key === 'Escape') {
+                self.togglePause()
+            }
+        }
         this.game.canvas.addEventListener('mousedown', this._mousedownHandler)
         this.game.canvas.addEventListener('mousemove', this._mousemoveHandler)
+        window.addEventListener('keydown', this._keydownHandler)
     }
 
     _removeInput() {
         this.game.canvas.removeEventListener('mousedown', this._mousedownHandler)
         this.game.canvas.removeEventListener('mousemove', this._mousemoveHandler)
+        window.removeEventListener('keydown', this._keydownHandler)
+    }
+
+    togglePause(forceState) {
+        if (this.gameOver || this.gameWin) return
+        if (typeof forceState === 'boolean') {
+            window.paused = forceState
+        } else {
+            window.paused = !window.paused
+        }
+    }
+
+    _hitButton(mx, my, btn) {
+        return mx >= btn.x && mx <= btn.x + btn.w && my >= btn.y && my <= btn.y + btn.h
+    }
+
+    _returnToTitle() {
+        this.togglePause(false)
+        this._removeInput()
+        this.game.replaceScene(ScenePvZTitle.new(this.game))
     }
 
     _onMouseMove(mx, my) {
@@ -233,7 +265,16 @@ class ScenePvZ extends LuckyScene {
     }
 
     _onClick(mx, my) {
-        if (this.gameOver || this.gameWin) return
+        SoundManager.instance().unlock()
+        if (this._hitButton(mx, my, this.pauseBtn)) {
+            this.togglePause()
+            return
+        }
+        if (this._hitButton(mx, my, this.menuBtn)) {
+            this._returnToTitle()
+            return
+        }
+        if (window.paused || this.gameOver || this.gameWin) return
 
         // 点击太阳
         for (var s of this.suns) {
@@ -556,6 +597,19 @@ class ScenePvZ extends LuckyScene {
         }
         ctx.fillText(waveText, this.game.canvas.width - 15, 20)
 
+        ctx.textAlign = 'center'
+        ctx.fillStyle = window.paused ? '#8b2f2f' : '#555'
+        ctx.fillRect(this.pauseBtn.x, this.pauseBtn.y, this.pauseBtn.w, this.pauseBtn.h)
+        ctx.fillStyle = '#555'
+        ctx.fillRect(this.menuBtn.x, this.menuBtn.y, this.menuBtn.w, this.menuBtn.h)
+        ctx.strokeStyle = '#ddd'
+        ctx.strokeRect(this.pauseBtn.x + 1, this.pauseBtn.y + 1, this.pauseBtn.w - 2, this.pauseBtn.h - 2)
+        ctx.strokeRect(this.menuBtn.x + 1, this.menuBtn.y + 1, this.menuBtn.w - 2, this.menuBtn.h - 2)
+        ctx.fillStyle = '#fff'
+        ctx.font = '12px Arial'
+        ctx.fillText(window.paused ? '继续' : '暂停', this.pauseBtn.x + this.pauseBtn.w / 2, this.pauseBtn.y + 17)
+        ctx.fillText('菜单', this.menuBtn.x + this.menuBtn.w / 2, this.menuBtn.y + 17)
+
         // 大波警报
         if (this.bigWaveAlert) {
             ctx.fillStyle = 'rgba(255,0,0,0.7)'
@@ -583,6 +637,17 @@ class ScenePvZ extends LuckyScene {
             ctx.font = 'bold 40px Arial'
             ctx.textAlign = 'center'
             ctx.fillText('胜利！', this.game.canvas.width / 2, this.game.canvas.height / 2)
+        }
+
+        if (window.paused && !this.gameOver && !this.gameWin) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
+            ctx.fillRect(0, 0, this.game.canvas.width, this.game.canvas.height)
+            ctx.fillStyle = '#fff'
+            ctx.font = 'bold 42px Arial'
+            ctx.textAlign = 'center'
+            ctx.fillText('已暂停', this.game.canvas.width / 2, this.game.canvas.height / 2 - 10)
+            ctx.font = '16px Arial'
+            ctx.fillText('按 Esc 或点击右上角继续', this.game.canvas.width / 2, this.game.canvas.height / 2 + 26)
         }
     }
 

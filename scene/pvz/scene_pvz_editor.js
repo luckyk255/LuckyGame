@@ -35,6 +35,7 @@ class ScenePvZEditor extends LuckyScene {
 
     _saveCurrentLevel() {
         if (this._isBuiltinLevel()) {
+            this._createCustomFromCurrent()
             return
         }
         var custom = ScenePvZ.loadCustomLevels()
@@ -160,12 +161,12 @@ class ScenePvZEditor extends LuckyScene {
         ctx.fillText('PvZ 关卡编辑器', 20, 38)
 
         ctx.font = '14px Arial'
-        ctx.fillText('用途：调整任意关卡并直接测试。内置关卡不能覆盖，只能复制为自定义关卡后保存。', 20, 64)
+        ctx.fillText('用途：调整任意关卡并直接测试。内置关卡点保存时会自动复制成自定义关卡。', 20, 64)
 
         ctx.fillStyle = '#d8d8d8'
         ctx.fillText('当前关卡: ' + (this.levelIndex + 1) + '/' + this.totalLevels + (this._isBuiltinLevel() ? '  内置' : '  自定义'), 20, 95)
         ctx.fillText('起始阳光: ' + this.levelConfig.startSun, 20, 120)
-        ctx.fillText('背景: ' + (this.levelConfig.bgType === 2 ? '黑夜' : '白天'), 190, 120)
+        ctx.fillText('背景: 白天', 190, 120)
         ctx.fillText('已解锁植物: ' + this.levelConfig.unlock.join(', '), 320, 120)
 
         this._addButton(20, 140, 36, 26, '<', () => {
@@ -182,26 +183,23 @@ class ScenePvZEditor extends LuckyScene {
         this._addButton(176, 140, 50, 26, '+25', () => {
             this.levelConfig.startSun += 25
         }, '#7a5c00')
-        this._addButton(248, 140, 70, 26, '切背景', () => {
-            this.levelConfig.bgType = this.levelConfig.bgType === 2 ? 0 : 2
-        }, '#345b8c')
-        this._addButton(338, 140, 92, 26, '复制为新关', () => {
+        this._addButton(248, 140, 92, 26, '复制为新关', () => {
             this._createCustomFromCurrent()
         }, '#2f7d32')
-        this._addButton(438, 140, 70, 26, '保存', () => {
+        this._addButton(348, 140, 70, 26, '保存', () => {
             this._saveCurrentLevel()
         }, '#2f7d32')
-        this._addButton(516, 140, 78, 26, '删自定义', () => {
+        this._addButton(426, 140, 78, 26, '删自定义', () => {
             this._deleteCurrentCustom()
         }, '#8b2f2f')
-        this._addButton(602, 140, 82, 26, '进入测试', () => {
+        this._addButton(512, 140, 82, 26, '进入测试', () => {
             if (!this._isBuiltinLevel()) {
                 this._saveCurrentLevel()
             }
             this._removeInput()
             this.game.replaceScene(ScenePvZ.new(this.game, this.levelIndex, this.levelConfig))
         }, '#4a9a00')
-        this._addButton(692, 140, 88, 26, '返回菜单', () => {
+        this._addButton(602, 140, 88, 26, '返回菜单', () => {
             this._removeInput()
             this.game.replaceScene(ScenePvZTitle.new(this.game))
         }, '#555')
