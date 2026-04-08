@@ -1,10 +1,11 @@
 // 植物大战僵尸主场景 - 多关卡系统
 class ScenePvZ extends LuckyScene {
-    constructor(game, levelIndex) {
+    constructor(game, levelIndex, overrideConfig) {
         super(game)
 
         // 关卡配置
         this.levelIndex = levelIndex || 0
+        this.overrideConfig = overrideConfig ? ScenePvZ.cloneConfig(overrideConfig) : null
         this.levelConfig = this._getLevelConfig(this.levelIndex)
 
         // 阳光
@@ -30,6 +31,7 @@ class ScenePvZ extends LuckyScene {
         // 波次系统
         this.wave = 0
         this.waveConfig = this.levelConfig.waves
+        this.totalWaves = this.waveConfig.length
         this.waveTimer = 0
         this.pendingSpawns = []
         this.allWavesLaunched = false
@@ -52,78 +54,133 @@ class ScenePvZ extends LuckyScene {
         this._setupInput()
     }
 
-    static new(game, levelIndex) {
-        return new ScenePvZ(game, levelIndex)
+    static new(game, levelIndex, overrideConfig) {
+        return new ScenePvZ(game, levelIndex, overrideConfig)
     }
 
-    // ---- 关卡配置 ----
-    _getLevelConfig(level) {
-        var configs = [
-            // 第1关：白天，基础僵尸
+    static builtinLevelConfigs() {
+        return [
             {
                 startSun: 150,
-                bgType: 0,  // 白天
+                bgType: 0,
                 unlock: ['peashooter', 'sunflower', 'wallnut'],
                 waves: [
-                    { startDelay: 300, spawns: [
+                    { startDelay: 480, spawns: [
                         {delay: 0, row: 2, type: 'basic'},
-                        {delay: 90, row: 1, type: 'basic'},
-                        {delay: 180, row: 3, type: 'basic'},
+                        {delay: 120, row: 1, type: 'basic'},
                     ]},
-                    { startDelay: 600, spawns: [
-                        {delay: 0, row: 0, type: 'basic'},
-                        {delay: 60, row: 4, type: 'basic'},
-                        {delay: 120, row: 2, type: 'flag'},
+                    { startDelay: 780, spawns: [
+                        {delay: 0, row: 3, type: 'basic'},
+                        {delay: 100, row: 0, type: 'basic'},
+                    ]},
+                    { startDelay: 1120, spawns: [
+                        {delay: 0, row: 4, type: 'basic'},
+                        {delay: 90, row: 2, type: 'basic'},
+                        {delay: 190, row: 1, type: 'basic'},
+                    ]},
+                    { startDelay: 1520, spawns: [
+                        {delay: 0, row: 2, type: 'flag'},
+                        {delay: 80, row: 0, type: 'basic'},
+                        {delay: 180, row: 4, type: 'basic'},
                     ]},
                 ]
             },
-            // 第2关：白天，加入路障和报纸
             {
                 startSun: 100,
                 bgType: 0,
                 unlock: ['peashooter', 'sunflower', 'wallnut', 'snowpea'],
                 waves: [
-                    { startDelay: 300, spawns: [
+                    { startDelay: 420, spawns: [
                         {delay: 0, row: 2, type: 'basic'},
-                        {delay: 90, row: 1, type: 'cone'},
+                        {delay: 120, row: 1, type: 'cone'},
                     ]},
-                    { startDelay: 600, spawns: [
+                    { startDelay: 760, spawns: [
                         {delay: 0, row: 3, type: 'basic'},
-                        {delay: 60, row: 0, type: 'paper'},
-                        {delay: 120, row: 4, type: 'cone'},
+                        {delay: 100, row: 0, type: 'paper'},
                     ]},
-                    { startDelay: 1000, spawns: [
+                    { startDelay: 1120, spawns: [
+                        {delay: 0, row: 4, type: 'cone'},
+                        {delay: 110, row: 2, type: 'basic'},
+                        {delay: 200, row: 1, type: 'paper'},
+                    ]},
+                    { startDelay: 1560, spawns: [
                         {delay: 0, row: 1, type: 'flag'},
-                        {delay: 30, row: 2, type: 'cone'},
-                        {delay: 60, row: 3, type: 'paper'},
+                        {delay: 90, row: 2, type: 'cone'},
+                        {delay: 180, row: 3, type: 'paper'},
+                        {delay: 270, row: 0, type: 'cone'},
                     ]},
                 ]
             },
-            // 第3关：黑夜，全类型
             {
                 startSun: 100,
-                bgType: 2,  // 黑夜
+                bgType: 2,
                 unlock: ['peashooter', 'sunflower', 'wallnut', 'snowpea', 'cherrybomb', 'repeaterpea'],
                 waves: [
-                    { startDelay: 240, spawns: [
+                    { startDelay: 420, spawns: [
                         {delay: 0, row: 2, type: 'cone'},
-                        {delay: 90, row: 1, type: 'basic'},
+                        {delay: 120, row: 1, type: 'basic'},
                     ]},
-                    { startDelay: 540, spawns: [
+                    { startDelay: 760, spawns: [
                         {delay: 0, row: 0, type: 'bucket'},
-                        {delay: 60, row: 4, type: 'cone'},
-                        {delay: 120, row: 2, type: 'paper'},
+                        {delay: 110, row: 4, type: 'cone'},
+                        {delay: 220, row: 2, type: 'paper'},
                     ]},
-                    { startDelay: 900, spawns: [
+                    { startDelay: 1180, spawns: [
+                        {delay: 0, row: 3, type: 'bucket'},
+                        {delay: 80, row: 1, type: 'paper'},
+                        {delay: 190, row: 0, type: 'cone'},
+                    ]},
+                    { startDelay: 1680, spawns: [
                         {delay: 0, row: 1, type: 'flag'},
-                        {delay: 30, row: 3, type: 'bucket'},
-                        {delay: 60, row: 0, type: 'cone'},
-                        {delay: 90, row: 4, type: 'paper'},
-                        {delay: 120, row: 2, type: 'bucket'},
+                        {delay: 90, row: 3, type: 'bucket'},
+                        {delay: 180, row: 0, type: 'cone'},
+                        {delay: 270, row: 4, type: 'paper'},
+                        {delay: 360, row: 2, type: 'bucket'},
                     ]},
                 ]
             }
         ]
+    }
+
+    static _storageKey() {
+        return 'pvz_custom_levels_v1'
+    }
+
+    static cloneConfig(config) {
+        return JSON.parse(JSON.stringify(config))
+    }
+
+    static loadCustomLevels() {
+        try {
+            var raw = localStorage.getItem(ScenePvZ._storageKey())
+            if (!raw) return []
+            var data = JSON.parse(raw)
+            return Array.isArray(data) ? data : []
+        } catch (e) {
+            return []
+        }
+    }
+
+    static saveCustomLevels(levels) {
+        localStorage.setItem(ScenePvZ._storageKey(), JSON.stringify(levels || []))
+    }
+
+    static allLevelConfigs() {
+        var builtin = ScenePvZ.builtinLevelConfigs().map(ScenePvZ.cloneConfig)
+        var custom = ScenePvZ.loadCustomLevels().map(ScenePvZ.cloneConfig)
+        return builtin.concat(custom)
+    }
+
+    static totalLevels() {
+        return ScenePvZ.allLevelConfigs().length
+    }
+
+    // ---- 关卡配置 ----
+    _getLevelConfig(level) {
+        if (this.overrideConfig) {
+            return ScenePvZ.cloneConfig(this.overrideConfig)
+        }
+        var configs = ScenePvZ.allLevelConfigs()
         return configs[level] || configs[0]
     }
 
@@ -299,6 +356,7 @@ class ScenePvZ extends LuckyScene {
                 var wc = this.waveConfig[w]
                 if (!wc.started && this.waveTimer >= wc.startDelay) {
                     wc.started = true
+                    this.wave = Math.max(this.wave, w + 1)
                     // 检测是否是大波（有旗帜僵尸）
                     for (var sp of wc.spawns) {
                         if (sp.type === 'flag') {
@@ -492,7 +550,10 @@ class ScenePvZ extends LuckyScene {
         ctx.fillStyle = '#fff'
         ctx.font = '12px Arial'
         ctx.textAlign = 'right'
-        var waveText = this.allWavesLaunched ? '最终波！' : ('波次 ' + (this.wave + 1))
+        var waveText = '准备布阵'
+        if (this.wave > 0) {
+            waveText = this.allWavesLaunched ? '最终波！' : ('波次 ' + this.wave + '/' + this.totalWaves)
+        }
         ctx.fillText(waveText, this.game.canvas.width - 15, 20)
 
         // 大波警报

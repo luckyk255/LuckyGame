@@ -25,6 +25,7 @@ class ZombieBucket extends ZombieBase {
         if (this.dying) return
         if (this.hasBucket) {
             this.bucketHp -= dmg
+            this.hp = 10 + Math.max(0, this.bucketHp)
             this.hitFlash = 5
             if (this.bucketHp <= 0) {
                 this.hasBucket = false
@@ -42,7 +43,7 @@ class ZombieBucket extends ZombieBase {
 
     update() {
         super.update()
-        if (!this.alive && !this.dying) return
+        if (!this.alive || this.dying) return
 
         var frameCount = this.getFrameCount()
         if (this.animFrame >= frameCount) {

@@ -25,6 +25,7 @@ class ZombieCone extends ZombieBase {
         if (this.dying) return
         if (this.hasCone) {
             this.coneHp -= dmg
+            this.hp = 10 + Math.max(0, this.coneHp)
             this.hitFlash = 5
             if (this.coneHp <= 0) {
                 this.hasCone = false
@@ -42,7 +43,7 @@ class ZombieCone extends ZombieBase {
 
     update() {
         super.update()
-        if (!this.alive && !this.dying) return
+        if (!this.alive || this.dying) return
 
         var frameCount = this.getFrameCount()
         if (this.animFrame >= frameCount) {

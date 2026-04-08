@@ -23,7 +23,7 @@ class ZombieBasic extends ZombieBase {
 
     update() {
         super.update()
-        if (!this.alive && !this.dying) return
+        if (!this.alive || this.dying) return
 
         // 帧动画更新
         this.animTimer++

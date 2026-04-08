@@ -33,7 +33,7 @@ class ScenePvZEnd extends LuckyScene {
             return
         }
         // 下一关按钮（胜利时）
-        if (this.win && this.levelIndex < 2) {
+        if (this.win && this.levelIndex < ScenePvZ.totalLevels() - 1) {
             if (x >= x1 && x <= x2 && y >= 320 && y <= 370) {
                 this.game.canvas.removeEventListener('mousedown', this._clickHandler)
                 var scene = ScenePvZ.new(this.game, this.levelIndex + 1)
@@ -73,7 +73,7 @@ class ScenePvZEnd extends LuckyScene {
         var btnX = this.game.canvas.width / 2 - 100
 
         // 下一关按钮（胜利且有下一关时）
-        if (win && this.levelIndex < 2) {
+        if (win && this.levelIndex < ScenePvZ.totalLevels() - 1) {
             ctx.fillStyle = '#4a9a00'
             ctx.fillRect(btnX, 320, 200, 45)
             ctx.strokeStyle = '#88cc44'

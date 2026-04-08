@@ -35,6 +35,9 @@ class ZombieBase {
         // 动画缩放
         this.scale = 0.5
 
+        // 帧计数，用于攻击节拍等逻辑
+        this.frame = 0
+
         // 死亡动画
         this.dying = false
         this.deathTimer = 0
@@ -51,21 +54,27 @@ class ZombieBase {
     }
 
     startDie() {
+        if (this.dying || !this.alive) return
         this.dying = true
         this.state = 'die'
+        this.targetPlant = null
         this.animFrame = 0
         this.animTimer = 0
+        this.deathTimer = 0
         playSound('zombie_die')
     }
 
     die() {
         this.alive = false
+        this.dying = false
+        this.targetPlant = null
     }
 
     // 检测正前方（当前格）是否有植物
     checkPlantAhead() {
         var lawn = this.lawn
-        var tile = lawn.getTile(this.x - 10, this.y)
+        var probeX = this.x - this.w * this.scale * 0.3
+        var tile = lawn.getTile(probeX, this.y)
         if (!tile) return null
         var [r, c] = tile
         if (r !== this.row) return null
@@ -74,6 +83,7 @@ class ZombieBase {
 
     update() {
         if (!this.alive) return
+        this.frame++
 
         // 更新冰冻减速
         if (this.iceSlow > 0) {

@@ -33,6 +33,36 @@ class Game {
         this.instance = this.instance || new this(...args)
         return this.instance
     }
+
+    _shouldKeyOutWhite(name) {
+        return name.indexOf('paper_walk_') === 0 ||
+            name.indexOf('paper_attack_') === 0 ||
+            name.indexOf('paper_no_walk_') === 0 ||
+            name.indexOf('paper_no_attack_') === 0
+    }
+
+    _keyOutWhite(img) {
+        var canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+        var ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        var pixels = imageData.data
+
+        for (var i = 0; i < pixels.length; i += 4) {
+            var r = pixels[i]
+            var g = pixels[i + 1]
+            var b = pixels[i + 2]
+            if (r > 245 && g > 245 && b > 245) {
+                pixels[i + 3] = 0
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0)
+        return canvas
+    }
+
     drawImage(luckyImage) {
         this.context.drawImage(luckyImage.texture, luckyImage.x, luckyImage.y, luckyImage.w, luckyImage.h)
     }
@@ -54,7 +84,7 @@ class Game {
             // log('img', img)
             img.onload = function() {
                 // 存取名字和图片的对应信息
-                g.images[name] = img
+                g.images[name] = g._shouldKeyOutWhite(name) ? g._keyOutWhite(img) : img
                 loads.push(1)
                     // log('load images', names.length, loads.length)
                 // 所有图片都载入成功后运行程序

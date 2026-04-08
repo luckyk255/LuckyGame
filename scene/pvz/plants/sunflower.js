@@ -47,6 +47,7 @@ class Sunflower extends PlantBase {
             var sx = this.x
             var sy = this.y - 20
             this.scene.spawnSun(sx, sy, false)
+            playSound('sun')
         }
     }
 

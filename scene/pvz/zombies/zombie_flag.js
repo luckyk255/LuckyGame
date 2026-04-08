@@ -23,7 +23,7 @@ class ZombieFlag extends ZombieBase {
 
     update() {
         super.update()
-        if (!this.alive && !this.dying) return
+        if (!this.alive || this.dying) return
 
         var frameCount = this.getFrameCount()
         if (this.animFrame >= frameCount) {
